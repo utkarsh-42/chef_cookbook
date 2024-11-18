@@ -3,14 +3,27 @@
 # The Chef InSpec reference, with examples and extensive documentation, can be
 # found at https://docs.chef.io/inspec/resources/
 
-unless os.windows?
-  # This is an example test, replace with your own test.
-  describe user('root'), :skip do
-    it { should exist }
-  end
+describe port(8080) do
+  it { should be_listening }
 end
 
-# This is an example test, replace it with your own test.
-describe port(80), :skip do
-  it { should_not be_listening }
+describe port(9100) do
+  it { should be_listening }
+end
+
+describe docker_container('main-app') do
+  it { should exist }
+  it { should be_running }
+end
+
+describe docker_container('metrics-app') do
+  it { should exist }
+  it { should be_running }
+end
+
+describe http('http://localhost:9100/metrics') do
+  its('status') { should eq 200 }
+  its('body') { should include 'system_cpu_usage' }
+  its('body') { should include 'system_memory_usage' }
+  its('body') { should include 'system_disk_usage' }
 end
